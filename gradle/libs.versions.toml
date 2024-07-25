@@ -1,20 +1,26 @@
 [versions]
 agp = "8.5.1"
+kotlin = "2.0.0"
+ksp = "2.0.0-1.0.23"
+
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
+
 androidx-activityCompose = "1.9.0"
 androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.1.4"
 androidx-core-ktx = "1.13.1"
 androidx-espresso-core = "3.6.1"
 androidx-material = "1.12.0"
-androidx-test-junit = "1.2.1"
 compose-plugin = "1.6.11"
+coil = "2.6.0"
+coil-compose = "2.6.0"
+
+androidx-test-junit = "1.2.1"
 junit = "4.13.2"
-kotlin = "2.0.0"
+
 coroutines = "1.9.0-RC"
-ksp = "2.0.0-1.0.23"
 lifecycle = "2.8.4"
 
 koin = "3.6.0-wasm-alpha2"
@@ -24,9 +30,6 @@ room = "2.7.0-alpha05"
 sqlite = "2.5.0-alpha05"
 
 ktor = "2.3.12"
-
-coil = "2.6.0"
-coil-compose = "2.6.0"
 
 datastore = "1.1.1"
 
@@ -46,6 +49,8 @@ androidx-lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-co
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+
 
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
@@ -70,9 +75,17 @@ datastore = { group = "androidx.datastore", name = "datastore", version.ref = "d
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
 room = { id = "androidx.room", version.ref = "room" }
+
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+
+# Plugins defined by this project
+myComposeMultiplatform = { id = "com.example.queueapp.composeMultiplatform", version = "unspecified" }
+myKotlinMultiplatform = { id = "com.example.queueapp.kotlinMultiplatform", version = "unspecified" }

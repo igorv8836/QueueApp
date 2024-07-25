@@ -52,13 +52,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
 
-//            implementation(libs.koin.android)
-//            implementation(libs.koin.compose)
-//            implementation(libs.koin.composeVM)
-//            implementation(libs.koin.compose.android)
-
-//            implementation(libs.androidx.lifecycle.viewmodel)
-
             implementation(project(":core:common"))
             implementation(project(":core:database"))
             implementation(project(":core:network"))
