@@ -1,7 +1,8 @@
 package di
 
 import com.example.common.commonModule
-import com.example.database.platformDatabaseModule
+import com.example.database.databaseModule
+import com.example.database.platformDatabaseBuilderModule
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -11,14 +12,15 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
         appDeclaration()
         modules(
             commonModule(),
-            platformDatabaseModule(),
+            platformDatabaseBuilderModule(),
+            databaseModule(),
             testModule()
         )
 
     }
 
 object KoinFactory {
-    var di: Koin? = null
+    private var di: Koin? = null
 
     fun setupKoin(appDeclaration: KoinAppDeclaration = {}) {
         if (di == null) {
