@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -27,6 +28,10 @@ kotlin {
             baseName = "database"
             isStatic = true
         }
+    }
+
+    sourceSets.commonMain{
+        kotlin.srcDir("build/generated/ksp/metadata")
     }
 
     sourceSets {
@@ -66,11 +71,11 @@ room {
 }
 
 dependencies {
-    with(libs.room.compiler) {
-        add("kspAndroid", this)
-        add("kspDesktop", this)
-        add("kspIosX64", this)
-        add("kspIosArm64", this)
-        add("kspIosSimulatorArm64", this)
+    add("kspCommonMainMetadata", libs.room.compiler)
+}
+
+tasks.withType<KotlinCompile<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata"){
+        dependsOn("kspCommonMainKotlinMetadata")
     }
 }

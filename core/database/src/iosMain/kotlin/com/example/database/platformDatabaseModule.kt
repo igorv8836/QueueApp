@@ -3,9 +3,11 @@ package com.example.database
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.example.database.database.AppDatabase
+import com.example.database.database.instantiateImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.dsl.module
+import platform.Foundation.NSHomeDirectory
 
 actual fun platformDatabaseModule() = module {
     single(createdAtStart = true) { provideDatabase() }
