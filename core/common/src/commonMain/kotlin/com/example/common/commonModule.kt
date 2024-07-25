@@ -9,14 +9,11 @@ import org.koin.core.module.dsl.withOptions
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-val commonModule = module {
-    single { provideIoDispatcher() } withOptions {
-        named(MyDispatchers.IO)
-    }
+fun commonModule() = module {
+    single(named(MyDispatchers.IO)) { provideIoDispatcher() }
 
-    single { provideDefaultDispatcher() } withOptions {
-        named(MyDispatchers.Default)
-    }
+    single(named(MyDispatchers.Default)) { provideDefaultDispatcher() }
+    single { provideDefaultDispatcher() }
 
     single {
         provideApplicationScope(
