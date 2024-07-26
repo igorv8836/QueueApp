@@ -1,7 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.database.dao.NewsDao
-import com.example.database.database.AppDatabase
 import com.example.database.model.NewsEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -9,7 +8,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class TestViewModel : ViewModel(), KoinComponent {
+class DatabaseTestViewModel : ViewModel(), KoinComponent {
     private val database: NewsDao by inject()
 
     val data = MutableStateFlow<List<NewsEntity>>(emptyList())

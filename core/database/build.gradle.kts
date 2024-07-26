@@ -7,7 +7,7 @@ plugins {
 }
 
 kotlin {
-    sourceSets.commonMain{
+    sourceSets.commonMain {
         kotlin.srcDir("build/generated/ksp/metadata")
     }
 
@@ -20,24 +20,14 @@ kotlin {
             implementation(libs.sqlite.bundled)
             implementation(libs.sqlite)
 
-
-            implementation(libs.koin.core)
-
             implementation(project(":core:common"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-
-        iosMain{
-
-        }
-
-        jvmMain{
-
-        }
     }
 }
+
 room {
     schemaDirectory("$projectDir/schemas")
 }
@@ -46,9 +36,9 @@ room {
 // Проблема с KSP, необходимо добавить зависимость на kspCommonMainMetadata не для android,
 // но на android данная зависимость ломает сборку приложения
 
-val isAndroid = false
+val isAndroid = true
 
-if (!isAndroid){
+if (!isAndroid) {
     dependencies.add("kspCommonMainMetadata", libs.room.compiler)
     tasks.withType<KotlinCompile<*>>().configureEach {
         if (name != "kspCommonMainKotlinMetadata") {

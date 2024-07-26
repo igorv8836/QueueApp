@@ -8,6 +8,7 @@ internal fun Project.configureKotlinAndroid(
     extension: LibraryExtension
 ) = extension.apply {
 
+
     val moduleName = path.split(":").drop(2).joinToString(".").replace("-", "_")
     namespace = if (moduleName.isNotEmpty()) "com.example.$moduleName" else "com.example.queueapp"
 
@@ -20,6 +21,7 @@ internal fun Project.configureKotlinAndroid(
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"

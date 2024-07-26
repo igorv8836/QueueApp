@@ -1,8 +1,10 @@
 package di
 
-import TestViewModel
+import DatabaseTestViewModel
+import NetworkTestViewModel
 import org.koin.dsl.module
 
 fun testModule() = module {
-    factory { TestViewModel() }
+    factory { DatabaseTestViewModel() }
+    factory { NetworkTestViewModel() }
 }

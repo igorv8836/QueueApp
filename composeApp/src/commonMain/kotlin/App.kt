@@ -16,8 +16,6 @@ import androidx.compose.ui.Modifier
 import di.KoinFactory
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.core.Koin
-import org.koin.core.KoinApplication
 import queueapp.composeapp.generated.resources.Res
 import queueapp.composeapp.generated.resources.compose_multiplatform
 
@@ -26,7 +24,7 @@ import queueapp.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
 
-    val viewModel = KoinFactory.getDI().get<TestViewModel>()
+    val viewModel = KoinFactory.getDI().get<NetworkTestViewModel>()
     val state by viewModel.data.collectAsState()
 
     MaterialTheme {
@@ -35,6 +33,7 @@ fun App() {
             Button(onClick = {
                 showContent = !showContent
             }) {
+                viewModel.getData()
                 Text("Click me!")
             }
             AnimatedVisibility(showContent) {

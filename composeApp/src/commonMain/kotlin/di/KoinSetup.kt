@@ -3,6 +3,7 @@ package di
 import com.example.common.commonModule
 import com.example.database.databaseModule
 import com.example.database.platformDatabaseBuilderModule
+import com.example.network.di.networkModule
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -14,7 +15,8 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
             commonModule(),
             platformDatabaseBuilderModule(),
             databaseModule(),
-            testModule()
+            testModule(),
+            networkModule()
         )
 
     }
