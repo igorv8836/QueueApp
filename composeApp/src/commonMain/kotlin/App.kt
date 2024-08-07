@@ -24,7 +24,7 @@ import queueapp.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
 
-    val viewModel = KoinFactory.getDI().get<NetworkTestViewModel>()
+    val viewModel = KoinFactory.getDI().get<DataStoreViewModel>()
     val state by viewModel.data.collectAsState()
 
     MaterialTheme {
@@ -33,7 +33,7 @@ fun App() {
             Button(onClick = {
                 showContent = !showContent
             }) {
-                viewModel.getData()
+                viewModel.saveData()
                 Text("Click me!")
             }
             AnimatedVisibility(showContent) {

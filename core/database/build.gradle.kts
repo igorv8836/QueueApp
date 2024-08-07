@@ -36,7 +36,7 @@ room {
 // Проблема с KSP, необходимо добавить зависимость на kspCommonMainMetadata не для android,
 // но на android данная зависимость ломает сборку приложения
 
-val isAndroid = true
+val isAndroid = false
 
 if (!isAndroid) {
     dependencies.add("kspCommonMainMetadata", libs.room.compiler)
