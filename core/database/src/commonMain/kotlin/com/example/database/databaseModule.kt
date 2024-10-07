@@ -26,7 +26,7 @@ private fun provideDatabase(
     coroutineContext: CoroutineDispatcher
 ) =
     builder
-        .setDriver(BundledSQLiteDriver())
         .fallbackToDestructiveMigration(true)
+        .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(coroutineContext)
         .build()

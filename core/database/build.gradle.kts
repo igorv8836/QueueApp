@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-
 plugins {
     alias(libs.plugins.myKotlinMultiplatform)
     alias(libs.plugins.room)
@@ -13,7 +11,7 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-            project.dependencies.add("kspAndroid", libs.room.compiler)
+
         }
         commonMain.dependencies {
             implementation(libs.room.runtime)
@@ -28,22 +26,12 @@ kotlin {
     }
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
+dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
 }
 
-
-// Проблема с KSP, необходимо добавить зависимость на kspCommonMainMetadata не для android,
-// но на android данная зависимость ломает сборку приложения
-
-val isAndroid = false
-
-if (!isAndroid) {
-    dependencies.add("kspCommonMainMetadata", libs.room.compiler)
-    tasks.withType<KotlinCompile<*>>().configureEach {
-        if (name != "kspCommonMainKotlinMetadata") {
-            dependsOn("kspCommonMainKotlinMetadata")
-        }
-    }
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 

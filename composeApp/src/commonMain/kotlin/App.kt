@@ -24,7 +24,7 @@ import queueapp.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
 
-    val viewModel = KoinFactory.getDI().get<DataStoreViewModel>()
+    val viewModel = KoinFactory.getDI().get<DatabaseTestViewModel>()
     val state by viewModel.data.collectAsState()
 
     MaterialTheme {
@@ -32,8 +32,8 @@ fun App() {
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Button(onClick = {
                 showContent = !showContent
+                viewModel.insert()
             }) {
-                viewModel.saveData()
                 Text("Click me!")
             }
             AnimatedVisibility(showContent) {

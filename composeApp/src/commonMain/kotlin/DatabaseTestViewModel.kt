@@ -18,7 +18,7 @@ class DatabaseTestViewModel : ViewModel(), KoinComponent {
         getData()
     }
 
-    private fun insert() {
+    fun insert() {
         viewModelScope.launch {
             for (i in 0..100) {
                 database.insertNews(
