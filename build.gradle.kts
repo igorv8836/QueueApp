@@ -7,4 +7,18 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.room) apply false
+    id("it.nicolasfarabegoli.conventional-commits") version "3.1.3"
+}
+
+
+conventionalCommits {
+    scopes = listOf(
+        "main",
+        "common",
+        "database",
+        "datastore",
+        "network",
+        "ui_theme",
+        "auth"
+    )
 }
