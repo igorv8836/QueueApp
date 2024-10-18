@@ -17,7 +17,7 @@ class DataStoreManager(
         }
     }
 
-    suspend fun getToken() = prefs.data.map {
+    fun getToken() = prefs.data.map {
         it[tokenKey]
     }
 }
