@@ -10,7 +10,7 @@ sealed interface MyResult<out T> {
     data class Error(val exception: Throwable) : MyResult<Nothing>
     data object Loading : MyResult<Nothing>
 
-    val isSuccess: Boolean
+    val success: Boolean
         get() = this is Success
 }
 

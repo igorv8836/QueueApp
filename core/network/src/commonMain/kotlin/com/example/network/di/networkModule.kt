@@ -1,13 +1,10 @@
 package com.example.network.di
 
+import com.example.datastore.TokenManager
 import com.example.network.getPlatformHttpClient
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.ResponseException
-import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -34,7 +31,7 @@ fun networkModule() = module {
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-private fun getReadyHttpClient(tokenProvider: DataStoreManager) =
+private fun getReadyHttpClient(tokenProvider: TokenManager) =
     getPlatformHttpClient().config {
         install(ContentNegotiation) {
             json(Json {
@@ -83,27 +80,32 @@ private fun getReadyHttpClient(tokenProvider: DataStoreManager) =
             }
         }
 
-        HttpResponseValidator {
-            handleResponseExceptionWithRequest { exception, request ->
-                when (exception) {
-                    is ClientRequestException -> {
-                        // Ошибка 4xx
-                        val response = exception.response
-                        println("Client error: ${response.status.value}")
-                    }
-                    is ServerResponseException -> {
-                        // Ошибка 5xx
-                        val response = exception.response
-                        println("Server error: ${response.status.value}")
-                    }
-                    is ResponseException -> {
-                        // Другая ошибка
-                        println("Unexpected error: ${exception.response.status.value}")
-                    }
-                    else -> {
-                        println("Unknown error: ${exception.message}")
-                    }
-                }
-            }
-        }
+//        HttpResponseValidator {
+//            handleResponseExceptionWithRequest { exception, _ ->
+//                when (exception) {
+//                    is ClientRequestException -> {
+//                        // Ошибка 4xx
+//                        val httpCode = exception.response.status.value
+//                        when (httpCode){
+//                            400 -> {  }
+//                            401 -> {  }
+//                            409 -> {  }
+//                            else -> {  }
+//                        }
+//                    }
+//                    is ServerResponseException -> {
+//                        // Ошибка 5xx
+//                        val response = exception.response
+//                        println("Server error: ${response.status.value}")
+//                    }
+//                    is ResponseException -> {
+//                        // Другая ошибка
+//                        println("Unexpected error: ${exception.response.status.value}")
+//                    }
+//                    else -> {
+//                        println("Unknown error: ${exception.message}")
+//                    }
+//                }
+//            }
+//        }
     }

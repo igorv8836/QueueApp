@@ -59,6 +59,8 @@ kotlin {
             implementation(project(":core:network"))
             implementation(project(":core:ui-theme"))
             implementation(project(":core:datastore"))
+
+            implementation(project(":data:auth"))
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

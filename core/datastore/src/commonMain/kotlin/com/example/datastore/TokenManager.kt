@@ -1,4 +1,4 @@
-package com.example.auth.local
+package com.example.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -19,5 +19,11 @@ class TokenManager(
 
     fun getToken() = prefs.data.map {
         it[tokenKey]
+    }
+
+    suspend fun removeToken() {
+        prefs.edit {
+            it.remove(tokenKey)
+        }
     }
 }
