@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.room) apply false
     id("it.nicolasfarabegoli.conventional-commits") version "3.1.3"
+    alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }
 
 

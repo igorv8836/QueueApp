@@ -12,8 +12,8 @@ kotlin {
             implementation(libs.ktor.content.negotiation)
             implementation(libs.ktor.serialization)
             implementation(libs.ktor.serialization.kotlinx.json)
-
             implementation(project(":core:common"))
+            implementation(project(":core:datastore"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
