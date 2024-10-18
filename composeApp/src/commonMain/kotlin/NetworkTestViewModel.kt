@@ -2,7 +2,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.database.dao.NewsDao
 import com.example.network.datasource.AuthNetworkDataSource
-import domain.models.news.NewsModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch

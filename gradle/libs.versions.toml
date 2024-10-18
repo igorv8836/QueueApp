@@ -1,13 +1,14 @@
 [versions]
 agp = "8.5.2"
 kotlin = "2.0.20"
+kotlinxSerializationJson = "1.5.1"
 ksp = "2.0.20-1.0.25"
 
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
 
-androidx-activityCompose = "1.9.2"
+androidx-activityCompose = "1.9.3"
 androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.1.4"
 androidx-core-ktx = "1.13.1"
@@ -26,12 +27,13 @@ lifecycle = "2.8.6"
 koin = "3.6.0-wasm-alpha2"
 koin-compose-vm = "1.2.0-Beta4"
 
-room = "2.7.0-alpha09"
-sqlite = "2.5.0-alpha09"
+room = "2.7.0-alpha10"
+sqlite = "2.5.0-alpha10"
 
 ktor = "2.3.12"
 
 datastore = "1.1.1"
+jetbrainsKotlinJvm = "2.0.10"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -58,6 +60,7 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-android = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-composeVM = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin-compose-vm" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
@@ -80,6 +83,18 @@ coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coi
 datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
+[bundles]
+ktor = [
+    "ktor-core",
+    "ktor-websockets",
+    "ktor-auth",
+    "ktor-logging",
+    "ktor-serialization",
+    "ktor-content-negotiation",
+    "ktor-serialization-kotlinx-json"
+]
+
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -97,3 +112,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 # Plugins defined by this project
 myComposeMultiplatform = { id = "com.example.queueapp.composeMultiplatform", version = "unspecified" }
 myKotlinMultiplatform = { id = "com.example.queueapp.kotlinMultiplatform", version = "unspecified" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
