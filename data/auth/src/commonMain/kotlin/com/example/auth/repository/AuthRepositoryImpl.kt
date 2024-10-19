@@ -11,7 +11,7 @@ import com.example.datastore.TokenManager
 import com.example.network.model.NetworkException
 import kotlinx.coroutines.flow.Flow
 
-class AuthRepositoryImpl(
+internal class AuthRepositoryImpl(
     private val api: RemoteDataSource,
     private val tokenManager: TokenManager
 ) : AuthRepository {

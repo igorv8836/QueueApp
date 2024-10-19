@@ -18,7 +18,7 @@ import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
-class AuthApiService(private val client: HttpClient) : RemoteDataSource {
+internal class AuthApiService(private val client: HttpClient) : RemoteDataSource {
     private val basePath = "/api/v1/auth"
 
     override suspend fun changePassword(request: PasswordChangeRequest): MyResult<BaseResponse<String>> {
