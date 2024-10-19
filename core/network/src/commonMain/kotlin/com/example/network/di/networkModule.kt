@@ -13,6 +13,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -20,9 +21,9 @@ import io.ktor.http.URLProtocol
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.first
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
+import kotlin.time.Duration.Companion.seconds
 
 fun networkModule() = module {
     single(createdAtStart = true) {
@@ -30,7 +31,6 @@ fun networkModule() = module {
     }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 private fun getReadyHttpClient(tokenProvider: TokenManager) =
     getPlatformHttpClient().config {
         install(ContentNegotiation) {
@@ -56,7 +56,7 @@ private fun getReadyHttpClient(tokenProvider: TokenManager) =
             agent = "KMPApp/1.0"
         }
         install(WebSockets) {
-            pingInterval = 15_000
+            pingInterval = 15.seconds
             maxFrameSize = Long.MAX_VALUE
         }
         install(Auth) {

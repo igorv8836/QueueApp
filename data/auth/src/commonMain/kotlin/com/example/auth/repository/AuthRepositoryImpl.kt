@@ -2,13 +2,13 @@ package com.example.auth.repository
 
 import com.example.auth.model.request.EmailLoginRequest
 import com.example.auth.model.request.EmailRegisterRequest
+import com.example.auth.model.request.PasswordChangeRequest
 import com.example.auth.model.request.PasswordResetRequest
 import com.example.auth.model.request.SendingResetCodeRequest
 import com.example.auth.network.RemoteDataSource
 import com.example.common.MyResult
 import com.example.datastore.TokenManager
 import com.example.network.model.NetworkException
-import com.example.network.util.safeApiCall
 import kotlinx.coroutines.flow.Flow
 
 class AuthRepositoryImpl(
@@ -21,61 +21,85 @@ class AuthRepositoryImpl(
         password: String,
         username: String
     ): MyResult<Unit> {
-        return safeApiCall {
-            val response = api.signUp(EmailRegisterRequest(email, password, username))
-            if (response.success) {
-                val token = response.message
-                tokenManager.saveToken(token)
-            } else {
-                throw NetworkException.ClientErrorException(response.message)
+        return when (val response = api.signUp(EmailRegisterRequest(email, password, username))) {
+            is MyResult.Success -> {
+                val token = response.data.message
+                if (response.success) {
+                    tokenManager.saveToken(token)
+                    MyResult.Success(Unit)
+                } else {
+                    MyResult.Error(NetworkException.UnexpectedException(response.data.message))
+                }
             }
+
+            is MyResult.Loading -> response
+            is MyResult.Error -> response
         }
     }
 
     override suspend fun login(email: String, password: String): MyResult<Unit> {
-        return safeApiCall {
-            val response = api.login(EmailLoginRequest(email, password))
-            if (response.success) {
-                val token = response.message
-                tokenManager.saveToken(token)
-            } else {
-                throw NetworkException.ClientErrorException(response.message)
+        return when (val response = api.login(EmailLoginRequest(email, password))) {
+            is MyResult.Success -> {
+                val token = response.data.message
+                if (response.data.success) {
+                    tokenManager.saveToken(token)
+                    MyResult.Success(Unit)
+                } else {
+                    MyResult.Error(NetworkException.UnexpectedException(response.data.message))
+                }
             }
+            is MyResult.Loading -> response
+            is MyResult.Error -> response
         }
     }
 
-    override suspend fun changePassword(email: String, newPassword: String): MyResult<String> {
-        return safeApiCall {
-            val response = api.changePassword(EmailLoginRequest(email, newPassword))
-            if (response.success) {
-                response.message
-            } else {
-                throw NetworkException.ClientErrorException(response.message)
+    override suspend fun changePassword(
+        email: String,
+        oldPassword: String,
+        newPassword: String
+    ): MyResult<String> {
+        return when (val response = api.changePassword(PasswordChangeRequest(email, oldPassword, newPassword))) {
+            is MyResult.Success -> {
+                if (response.data.success) {
+                    MyResult.Success(response.data.message)
+                } else {
+                    MyResult.Error(NetworkException.UnexpectedException(response.data.message))
+                }
             }
+            is MyResult.Loading -> response
+            is MyResult.Error -> response
         }
     }
 
-    override suspend fun resetPassword(email: String, resetCode: Int, newPassword: String): MyResult<String> {
-        return safeApiCall {
-            val response = api.resetPassword(
-                PasswordResetRequest(email, resetCode, newPassword)
-            )
-            if (response.success) {
-                response.message
-            } else {
-                throw NetworkException.ClientErrorException(response.message)
+    override suspend fun resetPassword(
+        email: String,
+        resetCode: Int,
+        newPassword: String
+    ): MyResult<String> {
+        return when (val response = api.resetPassword(PasswordResetRequest(email, resetCode, newPassword))) {
+            is MyResult.Success -> {
+                if (response.data.success) {
+                    MyResult.Success(response.data.message)
+                } else {
+                    MyResult.Error(NetworkException.UnexpectedException(response.data.message))
+                }
             }
+            is MyResult.Loading -> response
+            is MyResult.Error -> response
         }
     }
 
     override suspend fun sendResetCode(email: String): MyResult<String> {
-        return safeApiCall {
-            val response = api.sendEmailResetCode(SendingResetCodeRequest(email))
-            if (response.success) {
-                response.message
-            } else {
-                throw NetworkException.ClientErrorException(response.message)
+        return when (val response = api.sendEmailResetCode(SendingResetCodeRequest(email))) {
+            is MyResult.Success -> {
+                if (response.data.success) {
+                    MyResult.Success(response.data.message)
+                } else {
+                    MyResult.Error(NetworkException.UnexpectedException(response.data.message))
+                }
             }
+            is MyResult.Loading -> response
+            is MyResult.Error -> response
         }
     }
 

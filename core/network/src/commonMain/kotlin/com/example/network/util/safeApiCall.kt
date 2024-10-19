@@ -7,26 +7,36 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
-import io.ktor.utils.io.errors.IOException
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 
-suspend fun <T> safeApiCall(apiCall: suspend () -> T): MyResult<T> {
+suspend inline fun <reified T> safeApiCall(apiCall: () -> HttpResponse): MyResult<T> {
     return try {
-        MyResult.Success(apiCall())
+        val response = apiCall()
+        when (response.status) {
+            HttpStatusCode.OK -> {
+                val responseBody = response.body<T>()
+                MyResult.Success(responseBody)
+            }
+            HttpStatusCode.BadRequest -> {
+                MyResult.Error(NetworkException.ClientErrorException("BadRequest: " + response.body<BaseResponse<String>>().message))
+            }
+            HttpStatusCode.Unauthorized -> {
+                MyResult.Error(NetworkException.ClientErrorException("UnAuthorized: " + response.bodyAsText()))
+            }
+            HttpStatusCode.Conflict -> {
+                MyResult.Error(NetworkException.ClientErrorException("Conflict: " + response.body<BaseResponse<String>>().message))
+            }
+            else -> {
+                MyResult.Error(NetworkException.UnexpectedException("Unexpected status code: ${response.status.value}, ${response.bodyAsText()}"))
+            }
+        }
     } catch (e: ClientRequestException) {
-        val error = try {
-            NetworkException.ClientErrorException(getErrorText(e))
-        } catch (e: Exception) {
-            NetworkException.UnexpectedException("${e.message}")
-        }
-        MyResult.Error(error)
+        MyResult.Error(NetworkException.ClientErrorException(getErrorText(e)))
     } catch (e: ServerResponseException) {
-        val error = try {
-            NetworkException.ServerErrorException(getErrorText(e))
-        } catch (e: Exception) {
-            NetworkException.UnexpectedException("${e.message}")
-        }
-        MyResult.Error(error)
-    } catch (e: IOException) {
+        MyResult.Error(NetworkException.ServerErrorException(getErrorText(e)))
+    } catch (e: kotlinx.io.IOException) {
         MyResult.Error(NetworkException.NetworkIOException("${e.message}"))
     } catch (e: Exception) {
         MyResult.Error(NetworkException.UnexpectedException("${e.message}"))
@@ -34,10 +44,12 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): MyResult<T> {
 }
 
 
-private suspend fun getErrorText(e: ResponseException): String{
-    if (e.response.status.value == 401){
-        return "Unauthorized"
+
+suspend fun getErrorText(e: ResponseException): String{
+    return try {
+        e.response.body<BaseResponse<String>>().message
+    } catch (e: Exception) {
+        e.message ?: "Error"
     }
-    return e.response.body<BaseResponse<String>>().message
 }
 
