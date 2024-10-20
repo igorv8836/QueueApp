@@ -51,6 +51,8 @@ kotlin {
 
             implementation(libs.navigation.compose)
 
+            implementation(libs.napier)
+
 
             implementation(libs.koin.core)
 

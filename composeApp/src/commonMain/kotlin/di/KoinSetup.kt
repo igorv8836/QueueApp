@@ -8,12 +8,15 @@ import com.example.database.platformDatabaseBuilderModule
 import com.example.datastore.createDataStoreModule
 import com.example.datastore.datastoreModule
 import com.example.network.di.networkModule
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 
 fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
+        Napier.base(DebugAntilog())
         appDeclaration()
         modules(
             commonModule(),
