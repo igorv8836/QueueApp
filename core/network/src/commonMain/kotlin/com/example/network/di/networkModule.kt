@@ -2,6 +2,7 @@ package com.example.network.di
 
 import com.example.datastore.TokenManager
 import com.example.network.getPlatformHttpClient
+import io.github.aakira.napier.Napier
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
@@ -19,7 +20,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
@@ -50,7 +50,7 @@ private fun getReadyHttpClient(tokenProvider: TokenManager) =
         }
         install(HttpRequestRetry) {
             maxRetries = 3
-            retryOnExceptionIf { _, cause -> cause is IOException }
+            retryOnExceptionIf { _, cause -> cause is kotlinx.io.IOException }
         }
         install(UserAgent) {
             agent = "KMPApp/1.0"
@@ -63,6 +63,7 @@ private fun getReadyHttpClient(tokenProvider: TokenManager) =
             bearer {
                 loadTokens {
                     val token = tokenProvider.getToken().first()
+                    Napier.i { "Token: $token" }
                     if (!token.isNullOrEmpty()) {
                         BearerTokens(token, "")
                     } else {
@@ -76,7 +77,7 @@ private fun getReadyHttpClient(tokenProvider: TokenManager) =
             header(HttpHeaders.ContentType, ContentType.Application.Json)
             url {
                 protocol = URLProtocol.HTTPS
-                host = "https://quickqueues.tech"
+                host = "quickqueues.tech"
             }
         }
 

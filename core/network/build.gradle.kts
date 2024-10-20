@@ -13,6 +13,8 @@ kotlin {
             implementation(libs.ktor.serialization)
             implementation(libs.ktor.serialization.kotlinx.json)
 
+            implementation(libs.napier)
+
             implementation(project(":core:common"))
             implementation(project(":core:datastore"))
         }

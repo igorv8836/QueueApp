@@ -49,6 +49,9 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
+            implementation(libs.navigation.compose)
+
+
             implementation(libs.koin.core)
 
             implementation(libs.androidx.lifecycle.viewmodel)
@@ -61,6 +64,8 @@ kotlin {
             implementation(project(":core:datastore"))
 
             implementation(project(":data:auth"))
+
+            implementation(project(":feature:auth"))
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

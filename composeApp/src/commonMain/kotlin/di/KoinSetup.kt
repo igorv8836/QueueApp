@@ -1,6 +1,7 @@
 package di
 
 import com.example.auth.authDataModule
+import com.example.auth.di.authFeatureModule
 import com.example.common.commonModule
 import com.example.database.databaseModule
 import com.example.database.platformDatabaseBuilderModule
@@ -18,11 +19,11 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
             commonModule(),
             platformDatabaseBuilderModule(),
             databaseModule(),
-            testModule(),
             networkModule(),
             createDataStoreModule(),
             datastoreModule(),
-            authDataModule()
+            authDataModule(),
+            authFeatureModule()
         )
 
     }

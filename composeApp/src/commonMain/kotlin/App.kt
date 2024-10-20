@@ -1,51 +1,22 @@
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import di.KoinFactory
-import org.jetbrains.compose.resources.painterResource
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.example.auth.navigation.LoginRoute
+import com.example.auth.navigation.authNavGraph
+import com.example.ui_theme.AppTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import queueapp.composeapp.generated.resources.Res
-import queueapp.composeapp.generated.resources.compose_multiplatform
 
 
 @Composable
 @Preview
 fun App() {
+    AppTheme {
+        val navController = rememberNavController()
 
-    val viewModel = KoinFactory.getDI().get<DatabaseTestViewModel>()
-    val state by viewModel.data.collectAsState()
 
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = {
-                showContent = !showContent
-                viewModel.insert()
-            }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text(state.toString())
-                }
-            }
+        NavHost(navController = navController, startDestination = LoginRoute) {
+            authNavGraph(navController)
         }
     }
 }
