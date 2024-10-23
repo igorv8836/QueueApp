@@ -1,11 +1,8 @@
 import com.android.build.api.dsl.LibraryExtension
-import com.example.plugins.libs
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import com.example.plugins.*
+import org.gradle.api.*
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import com.example.plugins.configureKotlinAndroid
-import com.example.plugins.configureKotlinMultiplatform
 
 class KotlinMultiplatformConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) = with(target) {

@@ -7,7 +7,7 @@ import org.koin.android.ext.koin.androidContext
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        KoinFactory.setupKoin() {
+        KoinFactory.setupKoin {
             androidContext(this@App)
         }
     }

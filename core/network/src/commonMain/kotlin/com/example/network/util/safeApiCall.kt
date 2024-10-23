@@ -1,14 +1,10 @@
 package com.example.network.util
 
 import com.example.common.MyResult
-import com.example.network.model.BaseResponse
-import com.example.network.model.NetworkException
+import com.example.network.model.*
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.ResponseException
-import io.ktor.client.plugins.ServerResponseException
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
+import io.ktor.client.plugins.*
+import io.ktor.client.statement.*
 import io.ktor.http.HttpStatusCode
 
 suspend inline fun <reified T> safeApiCall(apiCall: () -> HttpResponse): MyResult<T> {
@@ -20,13 +16,16 @@ suspend inline fun <reified T> safeApiCall(apiCall: () -> HttpResponse): MyResul
                 MyResult.Success(responseBody)
             }
             HttpStatusCode.BadRequest -> {
-                MyResult.Error(NetworkException.ClientErrorException("BadRequest: " + response.body<BaseResponse<String>>().message))
+                MyResult.Error(NetworkException.ClientErrorException(response.body<BaseResponse<String>>().message))
             }
             HttpStatusCode.Unauthorized -> {
                 MyResult.Error(NetworkException.ClientErrorException("UnAuthorized: " + response.bodyAsText()))
             }
             HttpStatusCode.Conflict -> {
                 MyResult.Error(NetworkException.ClientErrorException("Conflict: " + response.body<BaseResponse<String>>().message))
+            }
+            HttpStatusCode.TooManyRequests -> {
+                MyResult.Error(NetworkException.ClientErrorException(response.body<BaseResponse<String>>().message))
             }
             else -> {
                 MyResult.Error(NetworkException.UnexpectedException("Unexpected status code: ${response.status.value}, ${response.bodyAsText()}"))

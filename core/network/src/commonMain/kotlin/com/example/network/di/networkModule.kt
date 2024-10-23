@@ -3,24 +3,16 @@ package com.example.network.di
 import com.example.datastore.TokenManager
 import com.example.network.getPlatformHttpClient
 import io.github.aakira.napier.Napier
-import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.UserAgent
-import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerTokens
-import io.ktor.client.plugins.auth.providers.bearer
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.plugins.websocket.pingInterval
+import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.header
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.URLProtocol
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import kotlin.time.Duration.Companion.seconds
@@ -31,8 +23,9 @@ fun networkModule() = module {
     }
 }
 
-private fun getReadyHttpClient(tokenProvider: TokenManager) =
-    getPlatformHttpClient().config {
+private fun getReadyHttpClient(tokenProvider: TokenManager): HttpClient {
+    Napier.i(message = "start", tag = "startClient")
+    return getPlatformHttpClient().config {
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
@@ -59,19 +52,6 @@ private fun getReadyHttpClient(tokenProvider: TokenManager) =
             pingInterval = 15.seconds
             maxFrameSize = Long.MAX_VALUE
         }
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    val token = tokenProvider.getToken().first()
-                    Napier.i { "Token: $token" }
-                    if (!token.isNullOrEmpty()) {
-                        BearerTokens(token, "")
-                    } else {
-                        null
-                    }
-                }
-            }
-        }
 
         install(DefaultRequest) {
             header(HttpHeaders.ContentType, ContentType.Application.Json)
@@ -79,34 +59,11 @@ private fun getReadyHttpClient(tokenProvider: TokenManager) =
                 protocol = URLProtocol.HTTPS
                 host = "quickqueues.tech"
             }
-        }
 
-//        HttpResponseValidator {
-//            handleResponseExceptionWithRequest { exception, _ ->
-//                when (exception) {
-//                    is ClientRequestException -> {
-//                        // Ошибка 4xx
-//                        val httpCode = exception.response.status.value
-//                        when (httpCode){
-//                            400 -> {  }
-//                            401 -> {  }
-//                            409 -> {  }
-//                            else -> {  }
-//                        }
-//                    }
-//                    is ServerResponseException -> {
-//                        // Ошибка 5xx
-//                        val response = exception.response
-//                        println("Server error: ${response.status.value}")
-//                    }
-//                    is ResponseException -> {
-//                        // Другая ошибка
-//                        println("Unexpected error: ${exception.response.status.value}")
-//                    }
-//                    else -> {
-//                        println("Unknown error: ${exception.message}")
-//                    }
-//                }
-//            }
-//        }
+            val token = runBlocking {
+                tokenProvider.getToken().first()
+            }
+            header(HttpHeaders.Authorization, "Bearer $token")
+        }
     }
+}

@@ -1,24 +1,20 @@
 package com.example.auth.viewmodel
 
 import androidx.compose.runtime.Stable
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.auth.repository.AuthRepository
 import com.example.common.MyResult
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.container
+import org.orbitmvi.orbit.*
 
 internal class RegisterViewModel(
-    private val authRepository: AuthRepository,
-    private val dispatcher: CoroutineDispatcher
+    private val authRepository: AuthRepository
 ) : ContainerHost<RegisterState, RegisterEffect>, ViewModel() {
     override val container =
         viewModelScope.container<RegisterState, RegisterEffect>(RegisterState.Loading)
 
     fun onEvent(event: RegisterEvent) {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             when (event) {
                 is RegisterEvent.NavigateToLoginScreen -> {
 

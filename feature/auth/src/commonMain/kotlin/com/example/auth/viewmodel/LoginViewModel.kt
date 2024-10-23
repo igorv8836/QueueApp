@@ -2,88 +2,125 @@ package com.example.auth.viewmodel
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.auth.repository.AuthRepository
 import com.example.common.MyResult
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.launch
+import com.example.orbit_mvi.viewmodel.container
 import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.container
 
 internal class LoginViewModel(
-    private val dispatcher: CoroutineDispatcher,
     private val authRepository: AuthRepository
 ) : ContainerHost<LoginState, LoginEffect>, ViewModel() {
-    override val container = viewModelScope.container<LoginState, LoginEffect>(LoginState.Loading)
+    override val container = container<LoginState, LoginEffect>(LoginState())
 
     fun onEvent(event: LoginEvent) {
-        viewModelScope.launch(dispatcher) {
-            when (event) {
-                is LoginEvent.Login -> {
-                    login(event.email, event.password)
-                }
-
-                is LoginEvent.SendResetCode -> {
-                    resetPassword(event.email)
-                }
-
-                is LoginEvent.ResetPassword -> {}
-            }
+        when (event) {
+            is LoginEvent.EmailChanged -> blockingIntent { reduce { state.copy(email = event.email) } }
+            is LoginEvent.PasswordChanged -> blockingIntent { reduce { state.copy(password = event.password) } }
+            is LoginEvent.ToggleRecoveryDialog -> intent { reduce { state.copy(showRecoveryDialog = !state.showRecoveryDialog) } }
+            is LoginEvent.Login -> login()
+            is LoginEvent.ToggleNewPassword -> intent { reduce { state.copy(showResetCodeTextField = !state.showResetCodeTextField) } }
+            is LoginEvent.SendResetCode -> sendResetCode()
+            is LoginEvent.ResetEmailChanged -> blockingIntent { reduce { state.copy(emailForReset = event.email) } }
+            is LoginEvent.UseResetCode -> useResetCode()
+            is LoginEvent.NewPasswordChanged -> blockingIntent { reduce { state.copy(newPassword = event.password) } }
+            is LoginEvent.ResetCodeChanged -> blockingIntent { reduce { state.copy(resetCode = event.code) } }
         }
     }
 
-    private fun login(email: String, password: String) = intent {
-        when (val result = authRepository.login(email, password)) {
+    private fun useResetCode() = intent {
+        state.resetCode.toIntOrNull()?.let {
+            when (val res =
+                authRepository.resetPassword(state.emailForReset, it, state.newPassword)) {
+                is MyResult.Error -> postSideEffect(
+                    LoginEffect.ShowError(
+                        res.exception.message ?: "Error"
+                    )
+                )
+
+                is MyResult.Success -> {
+                    postSideEffect(LoginEffect.ShowSuccessLogin("Password has been changed"))
+                    reduce {
+                        state.copy(
+                            showResetCodeTextField = false,
+                            showRecoveryDialog = false
+                        )
+                    }
+                }
+
+                else -> {}
+            }
+        } ?: run {
+            postSideEffect(LoginEffect.ShowError("String is entered instead of a number"))
+        }
+    }
+
+    private fun login() = intent {
+        reduce { state.copy(isLoading = true) }
+        when (val result = authRepository.login(state.email, state.password)) {
             is MyResult.Success -> {
-                reduce { LoginState.Success(email, password, null) }
-                postSideEffect(LoginEffect.SuccessLogin("Success"))
+                postSideEffect(LoginEffect.ShowSuccessLogin("Successful login"))
+                reduce { state.copy(isLoading = false) }
             }
 
             is MyResult.Error -> {
-                reduce { LoginState.Success(email, password, result.exception.message) }
                 postSideEffect(LoginEffect.ShowError(result.exception.message ?: "Error"))
+                reduce { state.copy(isLoading = false) }
             }
 
             is MyResult.Loading -> {
-                reduce { LoginState.Loading }
+                reduce { state.copy(isLoading = true) }
             }
         }
     }
 
-    private fun resetPassword(email: String) = intent {
-        when (val result = authRepository.sendResetCode(email)) {
+    private fun sendResetCode() = intent {
+        reduce { state.copy(showResetCodeTextField = true) }
+        when (val result = authRepository.sendResetCode(state.emailForReset)) {
             is MyResult.Success<*> -> {
-                postSideEffect(LoginEffect.SuccessLogin("Success"))
+                postSideEffect(LoginEffect.ShowSuccessLogin("Code has been sent"))
             }
 
             is MyResult.Error -> {
                 postSideEffect(LoginEffect.ShowError(result.exception.message ?: "Error"))
             }
 
-            is MyResult.Loading -> {
-                reduce { LoginState.Loading }
-            }
+            else -> {}
         }
     }
 }
 
 @Stable
-internal sealed interface LoginEvent {
-    data class Login(val email: String, val password: String) : LoginEvent
-    data class SendResetCode(val email: String) : LoginEvent
-    data class ResetPassword(val code: Int, val newPassword: String) : LoginEvent
+sealed interface LoginEvent {
+    data class EmailChanged(val email: String) : LoginEvent
+    data class ResetEmailChanged(val email: String) : LoginEvent
+    data class PasswordChanged(val password: String) : LoginEvent
+    data object ToggleRecoveryDialog : LoginEvent
+    data object Login : LoginEvent
+    data object SendResetCode : LoginEvent
+    data object UseResetCode : LoginEvent
+    data object ToggleNewPassword : LoginEvent
+    data class ResetCodeChanged(val code: String) : LoginEvent
+    data class NewPasswordChanged(val password: String) : LoginEvent
 }
 
+
 @Stable
-internal sealed interface LoginState {
-    data object Loading : LoginState
-    data class Error(val message: String) : LoginState
-    data class Success(val email: String, val password: String, val errorMessage: String?) :
-        LoginState
-}
+data class LoginState(
+    val email: String = "",
+    val password: String = "",
+    val isLoading: Boolean = false,
+    val emailErrorText: String? = null,
+    val passwordErrorText: String? = null,
+    val showRecoveryDialog: Boolean = false,
+    val showResetCodeTextField: Boolean = false,
+    val emailForReset: String = "",
+    val resetCode: String = "",
+    val newPassword: String = ""
+)
+
 
 @Stable
 internal sealed interface LoginEffect {
     data class ShowError(val message: String) : LoginEffect
-    data class SuccessLogin(val message: String) : LoginEffect
+    data class ShowSuccessLogin(val message: String) : LoginEffect
 }

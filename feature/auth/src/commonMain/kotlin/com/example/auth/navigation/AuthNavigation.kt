@@ -1,18 +1,15 @@
 package com.example.auth.navigation
 
 import androidx.compose.material3.Text
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
-import com.example.auth.ui.LoginScreen
-import com.example.auth.ui.RegisterScreen
+import com.example.auth.ui.*
 import kotlinx.serialization.Serializable
 
 
 fun NavGraphBuilder.authNavGraph(navController: NavController) {
     composable<LoginRoute> {
-        LoginScreen(navController)
+        LoginScreen(navController = navController)
     }
 
     composable<RegisterRoute> {

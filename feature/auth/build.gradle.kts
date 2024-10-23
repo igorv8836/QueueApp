@@ -21,6 +21,7 @@ kotlin {
             implementation(project(":core:common"))
             implementation(project(":core:ui-theme"))
             implementation(project(":data:auth"))
+            implementation(project(":orbit_mvi"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

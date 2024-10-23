@@ -17,3 +17,5 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 /changes.patch
+/core/database/schemas/com.example.database.database.AppDatabase/1.json
+/composeApp/prefs.preferences_pb

@@ -1,112 +1,70 @@
 package com.example.auth.ui
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Password
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.auth.navigation.navigateToMain
-import com.example.auth.navigation.navigateToRegister
-import com.example.auth.viewmodel.LoginEffect
-import com.example.auth.viewmodel.LoginEvent
-import com.example.auth.viewmodel.LoginViewModel
+import androidx.navigation.compose.rememberNavController
+import com.example.auth.navigation.*
+import com.example.auth.viewmodel.*
+import com.example.orbit_mvi.compose.collectSideEffect
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-import queueapp.feature.auth.generated.resources.Res
-import queueapp.feature.auth.generated.resources.main
+import queueapp.feature.auth.generated.resources.*
+
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-internal fun LoginScreen(navController: NavController) {
-    val viewModel: LoginViewModel = koinViewModel()
+internal fun LoginScreen(
+    viewModel: LoginViewModel = koinViewModel(),
+    navController: NavController
+) {
     val snackBarHostState = remember { SnackbarHostState() }
-
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.container.sideEffectFlow.collect {
-            when (it) {
-                is LoginEffect.ShowError -> {
-                    snackBarHostState.showSnackbar(it.message)
-                }
+    viewModel.collectSideEffect {
+        when (it) {
+            is LoginEffect.ShowError -> {
+                snackBarHostState.showSnackbar(it.message)
+            }
 
-                is LoginEffect.SuccessLogin -> {
-                    snackBarHostState.showSnackbar(it.message)
-                    delay(1000)
-                    navController.navigateToMain()
-                }
+            is LoginEffect.ShowSuccessLogin -> {
+                snackBarHostState.showSnackbar(it.message)
+                delay(300)
+                navController.navigateToMain()
             }
         }
     }
 
     LoginScreen(
+        state = state,
         onEvent = viewModel::onEvent,
-        navigateToRegister = { navController.navigateToRegister(it) },
-        snackBarHostState
+        navController = navController
     )
 }
 
 @Composable
 internal fun LoginScreen(
+    state: LoginState,
     onEvent: (LoginEvent) -> Unit,
-    navigateToRegister: (String?) -> Unit,
-    snackBarHostState: SnackbarHostState
+    navController: NavController
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var showRecoveryDialog by remember { mutableStateOf(false) }
+    val snackBarHostState = remember { SnackbarHostState() }
 
-    if (showRecoveryDialog) {
-        RecoveryDialog(
-            onConfirm = {
-                onEvent(LoginEvent.SendResetCode(it))
-                showRecoveryDialog = false
-            },
-            onDismiss = {
-                showRecoveryDialog = false
-            }
-        )
+    if (state.showRecoveryDialog) {
+        RecoveryDialog(state, onEvent)
     }
 
     Scaffold(
@@ -134,8 +92,8 @@ internal fun LoginScreen(
 
 
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { it1 -> email = it1 },
+                    value = state.email,
+                    onValueChange = { it1 -> onEvent(LoginEvent.EmailChanged(it1)) },
                     label = { Text("Введите почту") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
@@ -152,8 +110,8 @@ internal fun LoginScreen(
 
                 var passwordVisible by remember { mutableStateOf(false) }
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { it1 -> password = it1 },
+                    value = state.password,
+                    onValueChange = { it1 -> onEvent(LoginEvent.PasswordChanged(it1)) },
                     label = { Text("Введите пароль") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
@@ -176,7 +134,7 @@ internal fun LoginScreen(
                 )
 
                 TextButton(
-                    onClick = { showRecoveryDialog = true },
+                    onClick = { onEvent(LoginEvent.ToggleRecoveryDialog) },
                 ) {
                     Text("Забыли пароль?")
                 }
@@ -190,17 +148,22 @@ internal fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Button(
-                        onClick = { onEvent(LoginEvent.Login(email, password)) },
+                        enabled = !state.isLoading,
+                        onClick = { onEvent(LoginEvent.Login) },
                         shape = MaterialTheme.shapes.medium,
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
                             .padding(bottom = 8.dp)
                     ) {
-                        Text("Войти")
+                        if (state.isLoading) {
+                            CircularProgressIndicator()
+                        } else {
+                            Text("Войти")
+                        }
                     }
 
                     Button(
-                        onClick = { navigateToRegister(email) },
+                        onClick = { navController.navigateToRegister(state.email) },
                         shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.fillMaxWidth(0.5f)
                     ) {
@@ -216,51 +179,87 @@ internal fun LoginScreen(
 
 @Composable
 internal fun RecoveryDialog(
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit
+    state: LoginState,
+    onEvent: (LoginEvent) -> Unit,
 ) {
-    var recoveryTextField by remember { mutableStateOf("") }
     AlertDialog(
         title = { Text("Восстановление пароля") },
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onEvent(LoginEvent.ToggleRecoveryDialog) },
         confirmButton = {
-            TextButton(onClick = { onConfirm(recoveryTextField) }) {
-                Text("Отправить")
+            if (state.emailForReset.isNotBlank()) {
+                TextButton(onClick = { onEvent(LoginEvent.SendResetCode) }) {
+                    Text("Отправить")
+                }
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = { onEvent(LoginEvent.ToggleRecoveryDialog) }) {
                 Text("Отмена")
             }
         },
         text = {
             Column {
                 OutlinedTextField(
-                    value = recoveryTextField,
-                    onValueChange = { recoveryTextField = it },
+                    value = state.emailForReset,
+                    onValueChange = { onEvent(LoginEvent.ResetEmailChanged(it)) },
                     label = { Text("Введите почту") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                TextButton(
+                    onClick = { onEvent(LoginEvent.ToggleNewPassword) },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text("Ввести код и новый пароль")
+                }
+
+                AnimatedVisibility(
+                    visible = state.showResetCodeTextField,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
+                    Column {
+                        OutlinedTextField(
+                            value = state.resetCode,
+                            onValueChange = { onEvent(LoginEvent.ResetCodeChanged(it)) },
+                            label = { Text("Введите код") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                        )
+
+                        OutlinedTextField(
+                            value = state.newPassword,
+                            onValueChange = { onEvent(LoginEvent.NewPasswordChanged(it)) },
+                            label = { Text("Введите новый пароль") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            visualTransformation = PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                        )
+                    }
+                }
             }
         }
     )
 }
 
 
+
 @Preview
 @Composable
 internal fun RecoveryDialogPreview() {
-    RecoveryDialog({}, {})
+    RecoveryDialog(LoginState()) {}
 }
 
 @Preview
 @Composable
 internal fun LoginScreenPreview() {
     LoginScreen(
+        state = LoginState(),
         onEvent = {},
-        navigateToRegister = {},
-        remember { SnackbarHostState() }
+        navController = rememberNavController()
     )
 }
