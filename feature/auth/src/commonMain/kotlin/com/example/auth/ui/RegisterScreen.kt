@@ -13,6 +13,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.auth.navigation.navigateToMain
 import com.example.auth.viewmodel.*
+import com.example.orbit_mvi.compose.collectAsState
+import com.example.orbit_mvi.compose.collectSideEffect
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 
@@ -24,41 +26,41 @@ internal fun RegisterScreen(
     startEmail: String?,
     viewModel: RegisterViewModel = koinViewModel()
 ) {
-
-    val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
-
-
-
-    RegisterScreen(
-        navController = navController,
-        startEmail = startEmail,
-    )
-}
-
-@OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3Api::class)
-@Composable
-internal fun RegisterScreen(navController: NavController, startEmail: String?) {
-    val viewModel: RegisterViewModel = koinViewModel()
-    var email by remember { mutableStateOf(startEmail ?: "") }
-    var password by remember { mutableStateOf("") }
-    var nickname by remember { mutableStateOf("") }
+    val state by viewModel.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        viewModel.container.sideEffectFlow.collect {
-            when (it) {
-                is RegisterEffect.ShowError -> {
-                    snackBarHostState.showSnackbar(it.message)
-                }
+    viewModel.collectSideEffect {
+        when (it) {
+            is RegisterEffect.ShowError -> {
+                snackBarHostState.showSnackbar(it.message)
+            }
 
-                is RegisterEffect.ReturnToLogin -> {
-                    snackBarHostState.showSnackbar(it.message)
-                    navController.navigateToMain()
-                }
+            RegisterEffect.NavigateToMain -> {
+                navController.navigateToMain()
             }
         }
     }
 
+    RegisterScreen(
+        navController = navController,
+        state = state,
+        snackBarHostState = snackBarHostState
+    ) {
+        viewModel.onEvent(it)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun RegisterScreen(
+    navController: NavController,
+    state: RegisterState,
+    snackBarHostState: SnackbarHostState,
+    onEvent: (RegisterEvent) -> Unit
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var nickname by remember { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -89,6 +91,12 @@ internal fun RegisterScreen(navController: NavController, startEmail: String?) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
+                isError = state.emailError != null,
+                supportingText = {
+                    if (state.emailError != null){
+                        Text(state.emailError)
+                    }
+                },
                 label = { Text("Почта") },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
@@ -99,16 +107,13 @@ internal fun RegisterScreen(navController: NavController, startEmail: String?) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next
-                ),
-                label = { Text("Пароль") },
+            PasswordOutlinedTextField(
+                text = password,
+                passwordErrorText = state.passwordError ?: "",
                 modifier = Modifier.fillMaxWidth()
-            )
+            ){ it1 ->
+                password = it1
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -120,15 +125,29 @@ internal fun RegisterScreen(navController: NavController, startEmail: String?) {
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
+                isError = state.nicknameError != null,
+                supportingText = {
+                    if (state.nicknameError != null){
+                        Text(state.nicknameError)
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = {
-                viewModel.onEvent(RegisterEvent.Register(email, password, nickname))
-            }) {
-                Text("Зарегистрироваться")
+            Button(
+                onClick = {
+                    onEvent(RegisterEvent.Register(email, password, nickname))
+                },
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.fillMaxWidth(0.75f)
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    Text("Зарегистрироваться")
+                }
             }
         }
     }

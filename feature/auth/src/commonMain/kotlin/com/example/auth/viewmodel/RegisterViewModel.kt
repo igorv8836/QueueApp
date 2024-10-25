@@ -4,63 +4,59 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.*
 import com.example.auth.repository.AuthRepository
 import com.example.common.MyResult
+import com.example.orbit_mvi.viewmodel.container
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.*
 
 internal class RegisterViewModel(
     private val authRepository: AuthRepository
 ) : ContainerHost<RegisterState, RegisterEffect>, ViewModel() {
-    override val container =
-        viewModelScope.container<RegisterState, RegisterEffect>(RegisterState.Loading)
+    override val container = container<RegisterState, RegisterEffect>(RegisterState())
 
     fun onEvent(event: RegisterEvent) {
         viewModelScope.launch {
             when (event) {
-                is RegisterEvent.NavigateToLoginScreen -> {
-
-                }
-
                 is RegisterEvent.Register -> {
-                    register(event)
+                    register(event.email, event.password, event.nickname)
                 }
             }
         }
     }
 
-    private fun register(event: RegisterEvent.Register) = intent {
-        when (val result = authRepository.signUp(event.email, event.password, event.nickname)) {
+    private fun register(email: String, password: String, nickname: String) = intent {
+        reduce { state.copy(isLoading = true) }
+        when (val result = authRepository.signUp(email, password, nickname)) {
             is MyResult.Success -> {
-                reduce { RegisterState.Success }
-                postSideEffect(RegisterEffect.ReturnToLogin("Success"))
+                reduce { RegisterState(false, null, null, null) }
+                postSideEffect(RegisterEffect.NavigateToMain)
             }
 
             is MyResult.Error -> {
                 postSideEffect(RegisterEffect.ShowError(result.exception.message ?: "Error"))
+                reduce { state.copy(isLoading = false) }
             }
 
             is MyResult.Loading -> {
-                reduce { RegisterState.Loading }
+                reduce { state.copy(isLoading = true) }
             }
         }
     }
 }
 
-@Stable
 internal sealed interface RegisterEffect {
     data class ShowError(val message: String) : RegisterEffect
-    data class ReturnToLogin(val message: String) : RegisterEffect
+    data object NavigateToMain: RegisterEffect
+
 }
 
-@Stable
 internal sealed interface RegisterEvent {
-    data object NavigateToLoginScreen : RegisterEvent
-    data class Register(val email: String, val password: String, val nickname: String) :
-        RegisterEvent
+    data class Register(val email: String, val password: String, val nickname: String) : RegisterEvent
 }
 
 @Stable
-internal sealed interface RegisterState {
-    data object Loading : RegisterState
-    data class Error(val message: String) : RegisterState
-    data object Success : RegisterState
-}
+internal data class RegisterState(
+    val isLoading: Boolean = false,
+    val emailError: String? = null,
+    val passwordError: String? = null,
+    val nicknameError: String? = null,
+)

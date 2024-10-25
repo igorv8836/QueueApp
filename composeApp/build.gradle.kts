@@ -19,6 +19,8 @@ kotlin {
 
     jvm("desktop")
 
+
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -28,12 +30,14 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
 
+            freeCompilerArgs += listOf("-Xbinary=bundleId=com.example.queueapp")
 //            linkerOpts.add("-lsqlite3")
         }
     }
 
     sourceSets {
         val desktopMain by getting
+        val desktopTest by getting
 
         androidMain.dependencies {
             implementation(compose.preview)
