@@ -1,8 +1,7 @@
+
 import com.example.plugins.libs
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.api.*
+import org.gradle.kotlin.dsl.*
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -27,6 +26,9 @@ class ComposeMultiplatformConventionPlugin : Plugin<Project> {
                         implementation(composeDeps.ui)
                         implementation(composeDeps.components.resources)
                         implementation(composeDeps.components.uiToolingPreview)
+
+                        implementation(libs.findLibrary("navigation-compose").get())
+                        implementation(libs.findLibrary("orbit-core").get())
                     }
                 }
             }

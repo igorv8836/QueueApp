@@ -1,7 +1,7 @@
 package com.example.auth.di
 
 import com.example.auth.viewmodel.*
-import org.koin.compose.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 fun authFeatureModule() = module {

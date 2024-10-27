@@ -68,7 +68,7 @@ internal class LoginViewModel(
             }
 
             is MyResult.Error -> {
-                postSideEffect(LoginEffect.ShowMessage(result.exception.message ?: "Ошибка"))
+                postSideEffect(LoginEffect.ErrorInSendCode(result.exception.message ?: "Ошибка"))
             }
 
             else -> {}
@@ -98,5 +98,6 @@ data class LoginState(
 @Stable
 internal sealed interface LoginEffect {
     data class ShowMessage(val message: String) : LoginEffect
+    data class ErrorInSendCode(val message: String) : LoginEffect
     data class ShowSuccessLogin(val message: String) : LoginEffect
 }

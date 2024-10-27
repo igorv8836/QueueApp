@@ -5,7 +5,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -16,9 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.auth.navigation.*
 import com.example.auth.viewmodel.*
-import com.example.orbit_mvi.compose.collectAsState
-import com.example.orbit_mvi.compose.collectSideEffect
-import kotlinx.coroutines.delay
+import com.example.orbit_mvi.compose.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -43,8 +41,11 @@ internal fun LoginScreen(
 
             is LoginEffect.ShowSuccessLogin -> {
                 snackBarHostState.showSnackbar(it.message)
-                delay(100)
                 navController.navigateToMain()
+            }
+
+            is LoginEffect.ErrorInSendCode -> {
+                snackBarHostState.showSnackbar(it.message)
             }
         }
     }

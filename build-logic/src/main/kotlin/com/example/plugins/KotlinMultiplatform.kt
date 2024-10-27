@@ -2,8 +2,7 @@ package com.example.plugins
 
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.*
 
 internal fun Project.configureKotlinMultiplatform(
     extension: KotlinMultiplatformExtension
@@ -31,6 +30,7 @@ internal fun Project.configureKotlinMultiplatform(
         commonMain {
             dependencies {
                 implementation(libs.findLibrary("kotlinx.coroutines.core").get())
+                implementation(libs.findLibrary("kotlinx-serialization-json").get())
                 implementation(libs.findLibrary("napier").get())
                 api(libs.findLibrary("koin.core").get())
             }
