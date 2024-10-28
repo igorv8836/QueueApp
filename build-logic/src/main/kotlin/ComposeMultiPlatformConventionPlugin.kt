@@ -29,6 +29,7 @@ class ComposeMultiplatformConventionPlugin : Plugin<Project> {
 
                         implementation(libs.findLibrary("navigation-compose").get())
                         implementation(libs.findLibrary("orbit-core").get())
+                        implementation(libs.findLibrary("koin-compose").get())
                     }
                 }
             }

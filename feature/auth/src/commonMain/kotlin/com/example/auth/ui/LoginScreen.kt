@@ -14,9 +14,10 @@ import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.auth.navigation.*
+import com.example.auth.navigation.navigateToRegister
 import com.example.auth.viewmodel.*
 import com.example.orbit_mvi.compose.*
+import com.example.ui_common.navigation.navigateToMain
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel

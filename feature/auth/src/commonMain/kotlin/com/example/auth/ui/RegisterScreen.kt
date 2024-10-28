@@ -9,17 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.auth.navigation.navigateToMain
 import com.example.auth.viewmodel.*
-import com.example.orbit_mvi.compose.collectAsState
-import com.example.orbit_mvi.compose.collectSideEffect
+import com.example.orbit_mvi.compose.*
+import com.example.ui_common.navigation.navigateToMain
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.annotation.KoinExperimentalAPI
 
 
-@OptIn(KoinExperimentalAPI::class)
 @Composable
 internal fun RegisterScreen(
     navController: NavController,

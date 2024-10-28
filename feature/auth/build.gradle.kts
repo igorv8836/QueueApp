@@ -10,7 +10,7 @@ kotlin {
             implementation(libs.koin.composeVM)
 
             implementation(project(":core:common"))
-            implementation(project(":core:ui-theme"))
+            implementation(project(":core:ui-common"))
             implementation(project(":data:auth"))
             implementation(project(":orbit_mvi"))
         }

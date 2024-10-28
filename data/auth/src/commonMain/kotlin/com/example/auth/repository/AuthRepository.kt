@@ -1,5 +1,6 @@
 package com.example.auth.repository
 
+import com.example.auth.model.UserModel
 import com.example.common.MyResult
 import kotlinx.coroutines.flow.Flow
 
@@ -9,6 +10,7 @@ interface AuthRepository {
     suspend fun changePassword(email: String, oldPassword: String, newPassword: String): MyResult<String>
     suspend fun resetPassword(email: String, resetCode: Int, newPassword: String): MyResult<String>
     suspend fun sendResetCode(email: String): MyResult<String>
+    suspend fun getUser(): MyResult<UserModel>
     fun getToken(): Flow<String?>
     suspend fun logout(): MyResult<Unit>
 }

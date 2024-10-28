@@ -1,10 +1,8 @@
 package com.example.auth.repository
 
-import com.example.auth.model.request.EmailLoginRequest
-import com.example.auth.model.request.EmailRegisterRequest
-import com.example.auth.model.request.PasswordChangeRequest
-import com.example.auth.model.request.PasswordResetRequest
-import com.example.auth.model.request.SendingResetCodeRequest
+import com.example.auth.mapper.toUserModel
+import com.example.auth.model.UserModel
+import com.example.auth.model.request.*
 import com.example.auth.network.RemoteDataSource
 import com.example.common.MyResult
 import com.example.datastore.TokenManager
@@ -100,6 +98,14 @@ internal class AuthRepositoryImpl(
             }
             is MyResult.Loading -> response
             is MyResult.Error -> response
+        }
+    }
+
+    override suspend fun getUser(): MyResult<UserModel> {
+        return when (val response = api.getUserInfo()) {
+            is MyResult.Success -> MyResult.Success(response.data.toUserModel())
+            is MyResult.Error -> response
+            is MyResult.Loading -> response
         }
     }
 

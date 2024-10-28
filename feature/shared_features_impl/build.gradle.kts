@@ -6,7 +6,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-
+            implementation(project(":feature:shared_features_api"))
         }
     }
 }

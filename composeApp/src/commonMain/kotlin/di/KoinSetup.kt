@@ -3,13 +3,11 @@ package di
 import com.example.auth.authDataModule
 import com.example.auth.di.authFeatureModule
 import com.example.common.commonModule
-import com.example.database.databaseModule
-import com.example.database.platformDatabaseBuilderModule
-import com.example.datastore.createDataStoreModule
-import com.example.datastore.datastoreModule
+import com.example.database.*
+import com.example.datastore.*
 import com.example.network.di.networkModule
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+import com.example.shared_features_impl.sharedFeaturesModuleImpl
+import io.github.aakira.napier.*
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
@@ -26,7 +24,8 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
             createDataStoreModule(),
             datastoreModule(),
             authDataModule(),
-            authFeatureModule()
+            authFeatureModule(),
+            sharedFeaturesModuleImpl()
         )
 
     }

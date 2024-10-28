@@ -1,6 +1,5 @@
 package com.example.auth.navigation
 
-import androidx.compose.material3.Text
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.example.auth.ui.*
@@ -16,8 +15,8 @@ fun NavGraphBuilder.authNavGraph(navController: NavController) {
         RegisterScreen(navController, it.toRoute<RegisterRoute>().email)
     }
 
-    composable<Temp> {
-        Text("Main Screen")
+    composable<SplashRoute> {
+        SplashScreen(navController = navController)
     }
 }
 
@@ -29,16 +28,11 @@ fun NavController.navigateToLogin() {
     navigate(LoginRoute)
 }
 
-fun NavController.navigateToMain() {
-    navigate(Temp)
-}
-
-
 @Serializable
 data object LoginRoute
 
 @Serializable
-data class RegisterRoute(val email: String? = null)
+data object SplashRoute
 
 @Serializable
-data object Temp
+data class RegisterRoute(val email: String? = null)

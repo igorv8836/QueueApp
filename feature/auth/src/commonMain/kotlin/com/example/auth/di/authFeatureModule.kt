@@ -7,4 +7,5 @@ import org.koin.dsl.module
 fun authFeatureModule() = module {
     viewModel { RegisterViewModel(get()) }
     viewModel { LoginViewModel(get()) }
+    viewModel { SplashViewModel(get()) }
 }

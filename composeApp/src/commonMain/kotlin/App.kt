@@ -1,10 +1,10 @@
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
-import com.example.auth.navigation.LoginRoute
-import com.example.auth.navigation.authNavGraph
-import com.example.ui_theme.AppTheme
+import androidx.navigation.compose.*
+import bottom_navigation.AppBottomNavigation
+import com.example.auth.navigation.*
+import com.example.ui_common.AppTheme
+import com.example.ui_common.navigation.MainScreenRoute
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -13,10 +13,17 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun App() {
     AppTheme {
         val navController = rememberNavController()
+        val bottomNavController = rememberNavController()
 
-
-        NavHost(navController = navController, startDestination = LoginRoute) {
+        NavHost(navController = navController, startDestination = SplashRoute) {
             authNavGraph(navController)
+
+            composable<MainScreenRoute> {
+                AppBottomNavigation(
+                    mainNavController = navController,
+                    bottomNavController = bottomNavController
+                )
+            }
         }
     }
 }

@@ -46,6 +46,8 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -56,6 +58,7 @@ kotlin {
 
 
             implementation(libs.koin.core)
+            implementation(libs.koin.compose)
 
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.kotlinx.coroutines.core)
@@ -63,8 +66,11 @@ kotlin {
             implementation(project(":core:common"))
             implementation(project(":core:database"))
             implementation(project(":core:network"))
-            implementation(project(":core:ui-theme"))
+            implementation(project(":core:ui-common"))
             implementation(project(":core:datastore"))
+            implementation(project(":feature:shared_features_api"))
+
+            implementation(project(":feature:shared_features_impl"))
 
             implementation(project(":data:auth"))
 
