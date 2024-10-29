@@ -1,7 +1,7 @@
 package com.example.network.util
 
 import com.example.common.MyResult
-import com.example.network.model.*
+import com.example.network.model.NetworkException
 import io.ktor.client.call.body
 import io.ktor.client.plugins.*
 import io.ktor.client.statement.*
@@ -16,39 +16,28 @@ suspend inline fun <reified T> safeApiCall(apiCall: () -> HttpResponse): MyResul
                 MyResult.Success(responseBody)
             }
             HttpStatusCode.BadRequest -> {
-                MyResult.Error(NetworkException.ClientErrorException(response.body<BaseResponse<String>>().message))
+                MyResult.Error(NetworkException.ClientErrorException(response.bodyAsText()))
             }
             HttpStatusCode.Unauthorized -> {
-                MyResult.Error(NetworkException.ClientErrorException("UnAuthorized: " + response.bodyAsText()))
+                MyResult.Error(NetworkException.Unauthorized("UnAuthorized: " + response.bodyAsText()))
             }
             HttpStatusCode.Conflict -> {
-                MyResult.Error(NetworkException.ClientErrorException("Conflict: " + response.body<BaseResponse<String>>().message))
+                MyResult.Error(NetworkException.ClientErrorException("Conflict: " + response.bodyAsText()))
             }
             HttpStatusCode.TooManyRequests -> {
-                MyResult.Error(NetworkException.ClientErrorException(response.body<BaseResponse<String>>().message))
+                MyResult.Error(NetworkException.ClientErrorException(response.bodyAsText()))
             }
             else -> {
                 MyResult.Error(NetworkException.UnexpectedException("Unexpected status code: ${response.status.value}, ${response.bodyAsText()}"))
             }
         }
     } catch (e: ClientRequestException) {
-        MyResult.Error(NetworkException.ClientErrorException(getErrorText(e)))
+        MyResult.Error(NetworkException.ClientErrorException(e.response.bodyAsText()))
     } catch (e: ServerResponseException) {
-        MyResult.Error(NetworkException.ServerErrorException(getErrorText(e)))
+        MyResult.Error(NetworkException.ServerErrorException(e.response.bodyAsText()))
     } catch (e: kotlinx.io.IOException) {
         MyResult.Error(NetworkException.NetworkIOException("${e.message}"))
     } catch (e: Exception) {
         MyResult.Error(NetworkException.UnexpectedException("${e.message}"))
     }
 }
-
-
-
-suspend fun getErrorText(e: ResponseException): String{
-    return try {
-        e.response.body<BaseResponse<String>>().message
-    } catch (e: Exception) {
-        e.message ?: "Error"
-    }
-}
-

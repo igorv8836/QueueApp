@@ -1,27 +1,17 @@
 package com.example.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.example.database.model.NewsEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NewsDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNews(news: List<NewsEntity>)
-
-    @Update
-    suspend fun updateNews(news: NewsEntity)
+    @Query("SELECT * FROM news")
+    fun getNews(): Flow<List<NewsEntity>>
 
     @Query("DELETE FROM news")
-    suspend fun deleteAllNews()
+    suspend fun removeNews()
 
-    @Query("SELECT * FROM news")
-    suspend fun getAllNews(): List<NewsEntity>
-
-    @Query("SELECT * FROM news")
-    fun getFlowAllNews(): Flow<List<NewsEntity>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNews(news: List<NewsEntity>)
 }

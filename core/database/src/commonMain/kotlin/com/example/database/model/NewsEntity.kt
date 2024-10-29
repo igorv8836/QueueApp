@@ -1,7 +1,6 @@
 package com.example.database.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 @Entity(tableName = "news")
 data class NewsEntity(
