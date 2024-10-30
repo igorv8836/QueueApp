@@ -69,12 +69,10 @@ kotlin {
             implementation(project(":core:ui-common"))
             implementation(project(":core:datastore"))
             implementation(project(":feature:shared_features_api"))
-
             implementation(project(":feature:shared_features_impl"))
 
-            implementation(project(":data:auth"))
-
-            implementation(project(":feature:auth"))
+            implementation(project(":feature:auth_api"))
+            implementation(project(":feature:auth_impl"))
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

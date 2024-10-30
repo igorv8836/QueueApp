@@ -5,10 +5,6 @@ plugins {
 }
 
 kotlin {
-    sourceSets.commonMain {
-        kotlin.srcDir("build/generated/ksp/metadata")
-    }
-
     sourceSets {
         androidMain.dependencies {
 
@@ -27,11 +23,13 @@ kotlin {
 }
 
 dependencies {
+    add("kspDesktop", libs.room.compiler)
     add("kspAndroid", libs.room.compiler)
     add("kspIosX64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
 }
 
 room {
     schemaDirectory("$projectDir/schemas")
 }
-
