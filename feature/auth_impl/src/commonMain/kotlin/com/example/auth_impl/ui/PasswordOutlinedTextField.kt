@@ -1,5 +1,6 @@
 package com.example.auth_impl.ui
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -46,4 +47,16 @@ internal fun PasswordOutlinedTextField(
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         modifier = modifier
     )
+}
+
+@Composable
+@Preview
+internal fun PasswordOutlinedTextFieldPreview() {
+    PasswordOutlinedTextField(
+        text = "password",
+        passwordErrorText = "Error",
+        modifier = Modifier,
+        label = "Введите пароль",
+    ) {
+    }
 }

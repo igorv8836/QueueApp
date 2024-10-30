@@ -1,43 +1,18 @@
 package com.example.auth_impl.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.auth_impl.viewmodel.RegisterEffect
-import com.example.auth_impl.viewmodel.RegisterEvent
-import com.example.auth_impl.viewmodel.RegisterState
-import com.example.auth_impl.viewmodel.RegisterViewModel
-import com.example.orbit_mvi.compose.collectAsState
-import com.example.orbit_mvi.compose.collectSideEffect
+import com.example.auth_impl.viewmodel.*
+import com.example.orbit_mvi.compose.*
 import com.example.ui_common.navigation.navigateToMain
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -64,7 +39,7 @@ internal fun RegisterScreen(
     }
 
     RegisterScreen(
-        navController = navController,
+        popBackStack = navController::popBackStack,
         state = state,
         snackBarHostState = snackBarHostState
     ) {
@@ -75,7 +50,7 @@ internal fun RegisterScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RegisterScreen(
-    navController: NavController,
+    popBackStack: () -> Unit,
     state: RegisterState,
     snackBarHostState: SnackbarHostState,
     onEvent: (RegisterEvent) -> Unit
@@ -92,7 +67,7 @@ internal fun RegisterScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.popBackStack()
+                            popBackStack()
                         }
                     ) {
                         Icon(
@@ -173,4 +148,14 @@ internal fun RegisterScreen(
             }
         }
     }
+}
+
+@Composable
+@Preview
+internal fun RegisterScreenPreview() {
+    RegisterScreen(
+        popBackStack = { },
+        state = RegisterState(),
+        snackBarHostState = SnackbarHostState()
+    ) {}
 }

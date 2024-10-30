@@ -1,5 +1,6 @@
 package com.example.shared_features_impl.news_screen
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -85,9 +86,9 @@ fun NewsCard(newsItem: NewsModel) {
             )
             newsItem.createdAt?.let { it ->
                 Spacer(modifier = Modifier.height(8.dp))
-                val formattedDate = Instant.fromEpochMilliseconds(it)
+                val formattedDate = Instant.fromEpochMilliseconds(it * 1000)
                     .toLocalDateTime(TimeZone.currentSystemDefault())
-                    .let { "${it.dayOfMonth} ${it.month} ${it.year}" }
+                    .let { it1 -> "${it1.dayOfMonth} ${it1.month} ${it1.year}" }
                 Text(
                     text = "Опубликовано: $formattedDate",
                     style = MaterialTheme.typography.labelSmall,
@@ -96,4 +97,34 @@ fun NewsCard(newsItem: NewsModel) {
             }
         }
     }
+}
+
+@Composable
+@Preview
+fun NewsScreenPreview() {
+    NewsScreen(
+        NewsState.Success(
+            news = List(3) {
+                NewsModel(
+                    id = it,
+                    title = "Заголовок новости $it",
+                    content = "Содержание новости $it",
+                    createdAt = Clock.System.now().toEpochMilliseconds()
+                )
+            }
+        )
+    ) {}
+}
+
+@Composable
+@Preview
+fun NewsCardPreview() {
+    NewsCard(
+        NewsModel(
+            id = 0,
+            title = "Заголовок новости",
+            content = "Содержание новости",
+            createdAt = Clock.System.now().toEpochMilliseconds()
+        )
+    )
 }

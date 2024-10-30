@@ -1,6 +1,7 @@
 package com.example.auth_impl.ui
 
 import androidx.compose.animation.core.*
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,12 +12,10 @@ import androidx.compose.ui.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.auth_api.navigation.navigateToLogin
 import com.example.auth_impl.viewmodel.*
 import com.example.orbit_mvi.compose.collectAsState
 import com.example.ui_common.navigation.navigateToMain
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -27,13 +26,19 @@ internal fun SplashScreen(
 ) {
     val state by viewModel.collectAsState()
 
-    SplashScreen(state, navController, viewModel::onEvent)
+    SplashScreen(
+        state,
+        navigateToMain = navController::navigateToMain,
+        navigateToLogin = navController::navigateToLogin,
+        viewModel::onEvent
+    )
 }
 
 @Composable
 internal fun SplashScreen(
     state: SplashState,
-    navController: NavController,
+    navigateToMain: () -> Unit,
+    navigateToLogin: () -> Unit,
     onEvent: (SplashEvent) -> Unit
 ) {
     when (state) {
@@ -43,7 +48,7 @@ internal fun SplashScreen(
 
         is SplashState.Success -> {
             LaunchedEffect(Unit) {
-                navController.navigateToMain()
+                navigateToMain()
             }
         }
 
@@ -57,7 +62,7 @@ internal fun SplashScreen(
 
         SplashState.Unauthorized -> {
             LaunchedEffect(Unit) {
-                navController.navigateToLogin()
+                navigateToLogin()
             }
         }
     }
@@ -137,8 +142,16 @@ fun SplashError(
 
 @Composable
 @Preview
-internal fun SplashScreenPreview() {
-    SplashScreen(SplashState.Loading, rememberNavController()) {
+internal fun SplashScreenLoadingPreview() {
+    SplashScreen(SplashState.Loading, {}, {}) {
+
+    }
+}
+
+@Composable
+@Preview
+internal fun SplashScreenErrorPreview() {
+    SplashScreen(SplashState.Error("Error"), {}, {}) {
 
     }
 }

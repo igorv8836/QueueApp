@@ -1,6 +1,7 @@
 package com.example.auth_impl.ui
 
 import androidx.compose.animation.*
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,13 +14,11 @@ import androidx.compose.ui.*
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.auth_api.navigation.navigateToRegister
 import com.example.auth_impl.viewmodel.*
 import com.example.orbit_mvi.compose.*
 import com.example.ui_common.navigation.navigateToMain
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import queueapp.feature.auth_impl.generated.resources.*
 
@@ -51,8 +50,10 @@ internal fun LoginScreen(
     LoginScreen(
         state = state,
         onEvent = viewModel::onEvent,
-        navController = navController,
-        snackBarHostState = snackBarHostState
+        snackBarHostState = snackBarHostState,
+        navigateToRegister = { email ->
+            navController.navigateToRegister(email)
+        }
     )
 }
 
@@ -60,8 +61,8 @@ internal fun LoginScreen(
 internal fun LoginScreen(
     state: LoginState,
     onEvent: (LoginEvent) -> Unit,
-    navController: NavController,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
+    navigateToRegister: (String) -> Unit
 ) {
     var showRecoveryDialog by remember { mutableStateOf(false) }
     var emailField by rememberSaveable { mutableStateOf("") }
@@ -158,7 +159,7 @@ internal fun LoginScreen(
                     }
 
                     Button(
-                        onClick = { navController.navigateToRegister(emailField) },
+                        onClick = { navigateToRegister(emailField) },
                         shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.fillMaxWidth(0.75f)
                     ) {
@@ -280,7 +281,6 @@ internal fun LoginScreenPreview() {
     LoginScreen(
         state = LoginState(),
         onEvent = {},
-        navController = rememberNavController(),
         snackBarHostState = remember { SnackbarHostState() }
-    )
+    ) { }
 }
