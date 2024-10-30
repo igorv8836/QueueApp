@@ -25,4 +25,16 @@ internal class NewsRepositoryImpl(
             }
         }
     }.flowOn(dispatcher)
+
+    override suspend fun updateNews(): Result<Unit> {
+        return when (val news = newsApiService.getNews()) {
+            is MyResult.Error -> Result.failure(news.exception)
+            MyResult.Loading -> Result.failure(Exception("Loading"))
+            is MyResult.Success -> {
+                newsDao.removeNews()
+                newsDao.insertNews(news.data.map { it.toEntity() })
+                Result.success(Unit)
+            }
+        }
+    }
 }

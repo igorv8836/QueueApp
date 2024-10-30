@@ -23,7 +23,7 @@ internal class SplashViewModel(
                     if (!res.data.isActive) {
                         reduce { SplashState.Error("Ban: ${res.data.banReason ?: "-"}") }
                     } else {
-                        delay(1500)
+                        delay(500)
                         reduce { SplashState.Success }
                     }
                 }
