@@ -1,6 +1,5 @@
 package com.example.shared_features_impl.data.remote
 
-import com.example.common.MyResult
 import com.example.network.util.safeApiCall
 import com.example.shared_features_api.data.model.NewsModel
 import com.example.shared_features_api.data.remote.NewsRemoteSource
@@ -12,7 +11,7 @@ internal class NewsApiService(
 ) : NewsRemoteSource {
     private val basePath = "/api/v1/news"
 
-    override suspend fun getNews(): MyResult<List<NewsModel>> {
+    override suspend fun getNews(): Result<List<NewsModel>> {
         return safeApiCall {
             httpClient.get(basePath)
         }

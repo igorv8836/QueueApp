@@ -3,7 +3,6 @@ package com.example.auth_impl.viewmodel
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import com.example.auth_api.data.AuthRepository
-import com.example.common.MyResult
 import com.example.orbit_mvi.viewmodel.container
 import org.orbitmvi.orbit.ContainerHost
 
@@ -22,19 +21,12 @@ internal class LoginViewModel(
 
     private fun useResetCode(email: String, code: String, newPassword: String) = intent {
         code.toIntOrNull()?.let {
-            when (val res =
-                authRepository.resetPassword(email, it, newPassword)) {
-                is MyResult.Error -> postSideEffect(
-                    LoginEffect.ShowMessage(
-                        res.exception.message ?: "Ошибка"
-                    )
-                )
-
-                is MyResult.Success -> {
-                    postSideEffect(LoginEffect.ShowMessage("Пароль изменен"))
-                }
-
-                else -> {}
+            val result = authRepository.resetPassword(email, it, newPassword)
+            if (result.isFailure) {
+                val exceptionMessage = result.exceptionOrNull()?.message ?: "Ошибка"
+                postSideEffect(LoginEffect.ShowMessage(exceptionMessage))
+            } else {
+                postSideEffect(LoginEffect.ShowMessage("Пароль изменен"))
             }
             reduce { state.copy(codeErrorText = null) }
         } ?: run {
@@ -44,34 +36,23 @@ internal class LoginViewModel(
 
     private fun login(email: String, password: String) = intent {
         reduce { state.copy(isLoading = true) }
-        when (val result = authRepository.login(email, password)) {
-            is MyResult.Success -> {
-                postSideEffect(LoginEffect.ShowSuccessLogin("Успешный вход"))
-                reduce { state.copy(isLoading = false) }
-            }
-
-            is MyResult.Error -> {
-                postSideEffect(LoginEffect.ShowMessage(result.exception.message ?: "Ошибка"))
-                reduce { state.copy(isLoading = false) }
-            }
-
-            is MyResult.Loading -> {
-                reduce { state.copy(isLoading = true) }
-            }
+        val result = authRepository.login(email, password)
+        if (result.isSuccess) {
+            postSideEffect(LoginEffect.ShowSuccessLogin("Успешный вход"))
+        } else {
+            val exceptionMessage = result.exceptionOrNull()?.message ?: "Ошибка"
+            postSideEffect(LoginEffect.ShowMessage(exceptionMessage))
         }
+        reduce { state.copy(isLoading = false) }
     }
 
     private fun sendResetCode(email: String) = intent {
-        when (val result = authRepository.sendResetCode(email)) {
-            is MyResult.Success -> {
-                postSideEffect(LoginEffect.ShowMessage("Код отправлен"))
-            }
-
-            is MyResult.Error -> {
-                postSideEffect(LoginEffect.ErrorInSendCode(result.exception.message ?: "Ошибка"))
-            }
-
-            else -> {}
+        val result = authRepository.sendResetCode(email)
+        if (result.isSuccess) {
+            postSideEffect(LoginEffect.ShowMessage("Код отправлен"))
+        } else {
+            val exceptionMessage = result.exceptionOrNull()?.message ?: "Ошибка"
+            postSideEffect(LoginEffect.ErrorInSendCode(exceptionMessage))
         }
     }
 }

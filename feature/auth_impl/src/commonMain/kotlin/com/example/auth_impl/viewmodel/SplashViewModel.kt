@@ -3,7 +3,6 @@ package com.example.auth_impl.viewmodel
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import com.example.auth_api.data.AuthRepository
-import com.example.common.MyResult
 import com.example.network.model.NetworkException
 import com.example.orbit_mvi.viewmodel.container
 import kotlinx.coroutines.delay
@@ -18,27 +17,24 @@ internal class SplashViewModel(
 
     private fun getUserInfo() {
         intent {
-            when (val res = authRepository.getUser()) {
-                is MyResult.Success -> {
-                    if (!res.data.isActive) {
-                        reduce { SplashState.Error("Ban: ${res.data.banReason ?: "-"}") }
-                    } else {
-                        delay(500)
-                        reduce { SplashState.Success }
+            val result = authRepository.getUser()
+            if (result.isSuccess) {
+                val user = result.getOrThrow()
+                if (!user.isActive) {
+                    reduce { SplashState.Error("Ban: ${user.banReason ?: "-"}") }
+                } else {
+                    delay(500)
+                    reduce { SplashState.Success }
+                }
+            } else {
+                val exception = result.exceptionOrNull()
+                if (exception is NetworkException.Unauthorized) {
+                    reduce { SplashState.Unauthorized }
+                } else {
+                    reduce {
+                        SplashState.Error(exception?.message ?: "Error")
                     }
                 }
-
-                is MyResult.Error -> {
-                    if (res.exception is NetworkException.Unauthorized) {
-                        reduce { SplashState.Unauthorized }
-                    } else {
-                        reduce {
-                            SplashState.Error(res.exception.message ?: "Error")
-                        }
-                    }
-                }
-
-                MyResult.Loading -> {}
             }
         }
     }

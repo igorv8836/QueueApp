@@ -3,7 +3,6 @@ package com.example.auth_impl.viewmodel
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.*
 import com.example.auth_api.data.AuthRepository
-import com.example.common.MyResult
 import com.example.orbit_mvi.viewmodel.container
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
@@ -25,20 +24,14 @@ internal class RegisterViewModel(
 
     private fun register(email: String, password: String, nickname: String) = intent {
         reduce { state.copy(isLoading = true) }
-        when (val result = authRepository.signUp(email, password, nickname)) {
-            is MyResult.Success -> {
-                reduce { RegisterState(false, null, null, null) }
-                postSideEffect(RegisterEffect.NavigateToMain)
-            }
-
-            is MyResult.Error -> {
-                postSideEffect(RegisterEffect.ShowError(result.exception.message ?: "Error"))
-                reduce { state.copy(isLoading = false) }
-            }
-
-            is MyResult.Loading -> {
-                reduce { state.copy(isLoading = true) }
-            }
+        val result = authRepository.signUp(email, password, nickname)
+        if (result.isSuccess) {
+            reduce { RegisterState(isLoading = false) }
+            postSideEffect(RegisterEffect.NavigateToMain)
+        } else {
+            val exceptionMessage = result.exceptionOrNull()?.message ?: "Error"
+            postSideEffect(RegisterEffect.ShowError(exceptionMessage))
+            reduce { state.copy(isLoading = false) }
         }
     }
 }

@@ -1,43 +1,44 @@
 package com.example.network.util
 
-import com.example.common.MyResult
 import com.example.network.model.NetworkException
 import io.ktor.client.call.body
-import io.ktor.client.plugins.*
-import io.ktor.client.statement.*
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
-suspend inline fun <reified T> safeApiCall(apiCall: () -> HttpResponse): MyResult<T> {
+suspend inline fun <reified T> safeApiCall(apiCall: () -> HttpResponse): Result<T> {
     return try {
         val response = apiCall()
         when (response.status) {
             HttpStatusCode.OK -> {
                 val responseBody = response.body<T>()
-                MyResult.Success(responseBody)
+                Result.success(responseBody)
             }
             HttpStatusCode.BadRequest -> {
-                MyResult.Error(NetworkException.ClientErrorException(response.bodyAsText()))
+                Result.failure(NetworkException.ClientErrorException(response.bodyAsText()))
             }
             HttpStatusCode.Unauthorized -> {
-                MyResult.Error(NetworkException.Unauthorized("UnAuthorized: " + response.bodyAsText()))
+                Result.failure(NetworkException.Unauthorized("UnAuthorized: " + response.bodyAsText()))
             }
             HttpStatusCode.Conflict -> {
-                MyResult.Error(NetworkException.ClientErrorException("Conflict: " + response.bodyAsText()))
+                Result.failure(NetworkException.ClientErrorException("Conflict: " + response.bodyAsText()))
             }
             HttpStatusCode.TooManyRequests -> {
-                MyResult.Error(NetworkException.ClientErrorException(response.bodyAsText()))
+                Result.failure(NetworkException.ClientErrorException(response.bodyAsText()))
             }
             else -> {
-                MyResult.Error(NetworkException.UnexpectedException("Unexpected status code: ${response.status.value}, ${response.bodyAsText()}"))
+                Result.failure(NetworkException.UnexpectedException("Unexpected status code: ${response.status.value}, ${response.bodyAsText()}"))
             }
         }
     } catch (e: ClientRequestException) {
-        MyResult.Error(NetworkException.ClientErrorException(e.response.bodyAsText()))
+        Result.failure(NetworkException.ClientErrorException(e.response.bodyAsText()))
     } catch (e: ServerResponseException) {
-        MyResult.Error(NetworkException.ServerErrorException(e.response.bodyAsText()))
+        Result.failure(NetworkException.ServerErrorException(e.response.bodyAsText()))
     } catch (e: kotlinx.io.IOException) {
-        MyResult.Error(NetworkException.NetworkIOException("${e.message}"))
+        Result.failure(NetworkException.NetworkIOException("${e.message}"))
     } catch (e: Exception) {
-        MyResult.Error(NetworkException.UnexpectedException("${e.message}"))
+        Result.failure(NetworkException.UnexpectedException("${e.message}"))
     }
 }
