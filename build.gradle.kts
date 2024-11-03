@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.room) apply false
     alias(libs.plugins.conventional.commits) apply true
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+    alias(libs.plugins.compose.hot.reload) apply false
 }
 
 
